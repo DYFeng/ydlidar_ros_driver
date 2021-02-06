@@ -25,7 +25,7 @@
 #include <ros/ros.h>
 #include "sensor_msgs/LaserScan.h"
 #include "sensor_msgs/PointCloud.h"
-//#include "ydlidar_ros_driver/LaserFan.h"
+#include "ydlidar_ros_driver/PureLaserFan.h"
 #include "std_srvs/Empty.h"
 #include "src/CYdLidar.h"
 #include "ydlidar_config.h"
@@ -55,8 +55,8 @@ int main(int argc, char **argv) {
   ros::Publisher scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan", 1);
   ros::Publisher pc_pub = nh.advertise<sensor_msgs::PointCloud>("point_cloud",
                           1);
-//  ros::Publisher laser_fan_pub =
-//    nh.advertise<ydlidar_ros_driver::LaserFan>("laser_fan", 1);
+  ros::Publisher laser_fan_pub =
+    nh.advertise<ydlidar_ros_driver::PureLaserFan>("laser_fan", 1);
 
   ros::NodeHandle nh_private("~");
   std::string str_optvalue = "/dev/ydlidar";
@@ -174,14 +174,14 @@ int main(int argc, char **argv) {
     if (laser.doProcessSimple(scan)) {
       sensor_msgs::LaserScan scan_msg;
       sensor_msgs::PointCloud pc_msg;
-//      ydlidar_ros_driver::LaserFan fan;
+      ydlidar_ros_driver::PureLaserFan fan;
       ros::Time start_scan_time;
       start_scan_time.sec = scan.stamp / 1000000000ul;
       start_scan_time.nsec = scan.stamp % 1000000000ul;
       scan_msg.header.stamp = start_scan_time;
       scan_msg.header.frame_id = frame_id;
       pc_msg.header = scan_msg.header;
-//      fan.header = scan_msg.header;
+      fan.header = scan_msg.header;
       scan_msg.angle_min = (scan.config.min_angle);
       scan_msg.angle_max = (scan.config.max_angle);
       scan_msg.angle_increment = (scan.config.angle_increment);
@@ -189,12 +189,12 @@ int main(int argc, char **argv) {
       scan_msg.time_increment = scan.config.time_increment;
       scan_msg.range_min = (scan.config.min_range);
       scan_msg.range_max = (scan.config.max_range);
-//      fan.angle_min = (scan.config.min_angle);
-//      fan.angle_max = (scan.config.max_angle);
-//      fan.scan_time = scan.config.scan_time;
-//      fan.time_increment = scan.config.time_increment;
-//      fan.range_min = (scan.config.min_range);
-//      fan.range_max = (scan.config.max_range);
+      fan.angle_min = (scan.config.min_angle);
+      fan.angle_max = (scan.config.max_angle);
+      fan.scan_time = scan.config.scan_time;
+      fan.time_increment = scan.config.time_increment;
+      fan.range_min = (scan.config.min_range);
+      fan.range_max = (scan.config.max_range);
 
       int size = (scan.config.max_angle - scan.config.min_angle) /
                  scan.config.angle_increment + 1;
@@ -230,14 +230,14 @@ int main(int argc, char **argv) {
           pc_msg.channels[idx_timestamp].values.push_back(i * scan.config.time_increment);
         }
 
-//        fan.angles.push_back(scan.points[i].angle);
-//        fan.ranges.push_back(scan.points[i].range);
-//        fan.intensities.push_back(scan.points[i].intensity);
+        fan.angles.push_back(scan.points[i].angle);
+        fan.ranges.push_back(scan.points[i].range);
+        fan.intensities.push_back(scan.points[i].intensity);
       }
 
       scan_pub.publish(scan_msg);
       pc_pub.publish(pc_msg);
-//      laser_fan_pub.publish(fan);
+      laser_fan_pub.publish(fan);
 
     } else {
       ROS_ERROR("Failed to get Lidar Data");
