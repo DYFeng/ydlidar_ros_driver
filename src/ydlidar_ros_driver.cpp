@@ -25,7 +25,7 @@
 #include <ros/ros.h>
 #include "sensor_msgs/LaserScan.h"
 #include "sensor_msgs/PointCloud.h"
-#include "ydlidar_ros_driver/PureLaserFan.h"
+#include "robot_msgs/PureLaserFan.h"
 #include "std_srvs/Empty.h"
 #include "src/CYdLidar.h"
 #include "ydlidar_config.h"
@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
   ros::Publisher pc_pub = nh.advertise<sensor_msgs::PointCloud>("point_cloud",
                           1);
   ros::Publisher laser_fan_pub =
-    nh.advertise<ydlidar_ros_driver::PureLaserFan>("laser_fan", 1);
+    nh.advertise<robot_msgs::PureLaserFan>("laser_fan", 1);
 
   ros::NodeHandle nh_private("~");
   std::string str_optvalue = "/dev/ydlidar";
@@ -174,7 +174,7 @@ int main(int argc, char **argv) {
     if (laser.doProcessSimple(scan)) {
       sensor_msgs::LaserScan scan_msg;
       sensor_msgs::PointCloud pc_msg;
-      ydlidar_ros_driver::PureLaserFan fan;
+      robot_msgs::PureLaserFan fan;
       ros::Time start_scan_time;
       start_scan_time.sec = scan.stamp / 1000000000ul;
       start_scan_time.nsec = scan.stamp % 1000000000ul;
