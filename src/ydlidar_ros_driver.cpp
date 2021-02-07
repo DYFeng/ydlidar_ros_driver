@@ -229,10 +229,13 @@ int main(int argc, char **argv) {
           pc_msg.channels[idx_intensity].values.push_back(scan.points[i].intensity);
           pc_msg.channels[idx_timestamp].values.push_back(i * scan.config.time_increment);
         }
+        if(scan.points[i].intensity<=1010)
+        {
+          fan.angles.push_back(scan.points[i].angle);
+          fan.ranges.push_back(scan.points[i].range);
+          fan.intensities.push_back(scan.points[i].intensity);
+        }
 
-        fan.angles.push_back(scan.points[i].angle);
-        fan.ranges.push_back(scan.points[i].range);
-        fan.intensities.push_back(scan.points[i].intensity);
       }
 
       scan_pub.publish(scan_msg);
